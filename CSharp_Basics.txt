@@ -1,0 +1,41 @@
+What is C-# ?
+------------------------
+c# prnousing as C-sharp.
+c# is Programming language
+c# is Developed By MIcrosoft
+c# using we develop Web Apps,mobile apps,game,Desktop application,web services,database application etc
+The First version release on 2002
+
+
+C# Syntax
+------------------
+This code to print "Hello World" 
+
+Program.cs
+--------------
+using System;
+
+namespace HelloWorld
+{
+  class Program
+  {
+    static void Main(string[] args)
+    {
+      Console.WriteLine("Hello World!");    
+    }
+  }
+}
+
+
+O/P:
+Hello World!
+
+Where ,
+namespace is used to organize your code, and it is a container for classes and other namespaces. 
+using System means that we can use classes from the System namespace
+class is a container for data and methods,
+
+
+Note : 
+Every C# statement ends with a semicolon ;.
+C# is case-sensitive: "MyClass" and "myclass" has different meaning
