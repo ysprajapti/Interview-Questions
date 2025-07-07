@@ -462,3 +462,338 @@ Enable Trace:
 Key Use Cases:
 Debug page flow and events.
 Analyze execution time of controls.
+
+
+31. How do you optimize performance in a WebForms application?
+Techniques:
+
+1. Enable Page and Data Caching (use `OutputCache` and `Cache` API).
+2. Minimize ViewState (disable it where unnecessary).
+
+<asp:TextBox ID="txt1" runat="server" EnableViewState="false" />
+
+3. Use AJAX (UpdatePanel) to avoid full page reloads.
+4. Optimize database queries (use indexes, stored procedures).
+5. Compress HTTP responses using IIS GZip.
+6. Bundle & minify CSS/JS files.
+
+
+# ✅ **32. What are the limitations of WebForms compared to newer frameworks?**
+
+✔ **Limitations:**
+
+* ViewState increases page size.
+* Harder to test (tight coupling between UI and logic).
+* No clear separation of concerns (unlike MVC).
+* Less control over generated HTML.
+* Poor support for modern SPA and mobile apps.
+
+---
+
+# ✅ **33. How does ASP.NET WebForms maintain the state of controls between requests?**
+
+✔ **Using ViewState:**
+
+* Stores state of controls in a hidden field (`__VIEWSTATE`) on the page.
+* Sent to client and back to server on PostBack.
+
+✔ **Example:** TextBox value retained:
+
+```aspx
+<asp:TextBox ID="txtName" runat="server" />
+```
+
+---
+
+# ✅ **34. What is the difference between Web.config and Machine.config?**
+
+| **Feature**   | **Web.config**                       | **Machine.config**                           |
+| ------------- | ------------------------------------ | -------------------------------------------- |
+| **Scope**     | Specific to a web application        | Applies to all apps on the server            |
+| **Location**  | App root directory                   | Framework directory (e.g., `C:\Windows\...`) |
+| **Overrides** | Can override Machine.config settings | Cannot override Web.config                   |
+
+---
+
+# ✅ **35. What is the difference between authentication and authorization in WebForms?**
+
+| **Feature** | **Authentication**     | **Authorization**                         |
+| ----------- | ---------------------- | ----------------------------------------- |
+| **Purpose** | Verifies user identity | Determines what user is allowed to access |
+| **When?**   | Happens first          | Happens after authentication              |
+| **Example** | Login form validation  | Restricting Admin area to Admin users     |
+
+---
+
+# ✅ **36. Explain Forms Authentication in WebForms.**
+
+✔ **How It Works:**
+
+1. User submits credentials on `Login.aspx`.
+2. Validated against a database.
+3. Issue a **Forms Authentication Cookie**.
+4. Redirect to originally requested page.
+
+✔ **Configure in Web.config:**
+
+```xml
+<authentication mode="Forms">
+  <forms loginUrl="Login.aspx" timeout="30" />
+</authentication>
+```
+
+---
+
+# ✅ **37. How do you implement Role-Based Security in WebForms?**
+
+✔ **Steps:**
+
+1. Set Roles in code:
+
+```csharp
+if (Roles.IsUserInRole("Admin"))
+{
+    // Show admin features
+}
+```
+
+2. Restrict access in Web.config:
+
+```xml
+<authorization>
+  <allow roles="Admin" />
+  <deny users="*" />
+</authorization>
+```
+
+---
+
+# ✅ **38. What are Custom Controls in WebForms?**
+
+✔ **Definition:**
+Custom Controls are reusable server controls compiled into assemblies (.dll).
+
+✔ **Types:**
+
+* **Composite Controls:** Combine existing controls.
+* **Derived Controls:** Extend existing ones.
+
+✔ **Use Case:**
+Create a company-wide **login widget**.
+
+---
+
+# ✅ **39. What is the difference between Synchronous and Asynchronous PostBack?**
+
+| **Feature**         | **Synchronous PostBack** | **Asynchronous PostBack**           |
+| ------------------- | ------------------------ | ----------------------------------- |
+| **What Happens**    | Reloads entire page      | Only updates a portion of the page  |
+| **User Experience** | Slower, flickers         | Faster, smoother (AJAX UpdatePanel) |
+
+---
+
+# ✅ **40. What is AJAX in WebForms? How does UpdatePanel work?**
+
+✔ **AJAX (Asynchronous JavaScript and XML):** Enables partial page updates without full reload.
+
+✔ **UpdatePanel Example:**
+
+```aspx
+<asp:ScriptManager runat="server" />
+<asp:UpdatePanel runat="server">
+    <ContentTemplate>
+        <asp:Label ID="lblTime" runat="server" Text="Time" />
+        <asp:Button ID="btnUpdate" runat="server" Text="Update" OnClick="btnUpdate_Click" />
+    </ContentTemplate>
+</asp:UpdatePanel>
+```
+
+---
+
+# ✅ **41. What are Session Modes in ASP.NET (InProc, StateServer, SQLServer)?**
+
+| **Mode**        | **Description**                                         |
+| --------------- | ------------------------------------------------------- |
+| **InProc**      | Stores session in web server memory (default).          |
+| **StateServer** | Stores session in a separate process (Windows Service). |
+| **SQLServer**   | Stores session in a SQL database for persistence.       |
+
+---
+
+# ✅ **42. What is Web.config Transformation?**
+
+✔ **Definition:**
+A feature to automatically modify Web.config settings during deployment.
+
+✔ **Example:**
+
+* **Web.Release.config** overrides debug settings:
+
+```xml
+<system.web>
+  <compilation xdt:Transform="Replace" debug="false" />
+</system.web>
+```
+
+---
+
+# ✅ **43. How do you consume a Web API in a WebForms app?**
+
+✔ **Example using HttpClient:**
+
+```csharp
+HttpClient client = new HttpClient();
+var response = await client.GetAsync("https://api.example.com/products");
+string result = await response.Content.ReadAsStringAsync();
+```
+
+---
+
+# ✅ **44. What is the role of the Global.asax file?**
+
+✔ **Purpose:**
+
+* Define **application-level events**.
+* Examples: `Application_Start`, `Session_Start`, `Application_Error`.
+
+✔ **Example:**
+
+```csharp
+void Application_Start(object sender, EventArgs e)
+{
+    // Initialize application-wide settings
+}
+```
+
+---
+
+# ✅ **45. How do you cache a page or control in WebForms?**
+
+✔ **Page Caching:**
+
+```aspx
+<%@ OutputCache Duration="60" VaryByParam="None" %>
+```
+
+✔ **Control Caching:**
+Use `PartialCaching` attribute on user controls.
+
+---
+
+# ✅ **46. What is the difference between Response.Write and Response.Output.Write?**
+
+| **Feature**       | **Response.Write**     | **Response.Output.Write**                       |
+| ----------------- | ---------------------- | ----------------------------------------------- |
+| **Functionality** | Writes string directly | Supports formatted strings like `string.Format` |
+
+✔ **Example:**
+
+```csharp
+Response.Output.Write("Hello {0}", userName);
+```
+
+---
+
+# ✅ **47. What are Hidden Fields? When would you use them?**
+
+✔ **Definition:**
+A way to store data in a web page that’s **not visible** to users but sent during PostBack.
+
+✔ **Example:**
+
+```aspx
+<asp:HiddenField ID="hdnValue" runat="server" Value="123" />
+```
+
+✔ **Use Case:**
+Pass IDs or flags between requests without showing them on UI.
+
+---
+
+# ✅ **48. How do you upload and process files in WebForms?**
+
+✔ **Steps:**
+
+1. Add FileUpload control:
+
+```aspx
+<asp:FileUpload ID="FileUpload1" runat="server" />
+<asp:Button ID="btnUpload" Text="Upload" runat="server" OnClick="btnUpload_Click" />
+```
+
+2. Code-behind:
+
+```csharp
+if (FileUpload1.HasFile)
+{
+    FileUpload1.SaveAs(Server.MapPath("~/Uploads/" + FileUpload1.FileName));
+}
+```
+
+---
+
+# ✅ **49. What are Strongly Typed Data Controls in WebForms?**
+
+✔ **Definition:**
+Data controls (like GridView) bound to a specific **DataSource Type** with IntelliSense support.
+
+✔ **Example:**
+
+```aspx
+<asp:GridView runat="server" ItemType="MyApp.Models.Employee" />
+```
+
+---
+
+# ✅ **50. How do you handle large file uploads and prevent timeouts?**
+
+✔ **Solutions:**
+
+1. Increase limits in Web.config:
+
+```xml
+<httpRuntime maxRequestLength="51200" executionTimeout="3600" />
+```
+
+2. Use streaming API (e.g., `Request.Files`) to process chunks.
+3. Display progress with AJAX or third-party controls.
+
+---
+
+# 📝 **Quick Summary (31–50)**
+
+| **Q#** | **Topic**                               | **Key Takeaway**                             |
+| ------ | --------------------------------------- | -------------------------------------------- |
+| 31     | Optimize Performance                    | Minimize ViewState, caching, DB optimization |
+| 32     | WebForms Limitations                    | Not scalable, limited HTML control           |
+| 33     | State Maintenance                       | Uses ViewState (hidden field)                |
+| 34     | Web.config vs Machine.config            | App vs Server-wide settings                  |
+| 35     | Authentication vs Authorization         | Verify identity vs Access rights             |
+| 36     | Forms Authentication                    | Login flow with FormsAuth cookie             |
+| 37     | Role-Based Security                     | Restrict features by roles                   |
+| 38     | Custom Controls                         | Reusable server controls                     |
+| 39     | Sync vs Async PostBack                  | Async = UpdatePanel, no full reload          |
+| 40     | AJAX & UpdatePanel                      | Partial updates without full PostBack        |
+| 41     | Session Modes                           | InProc, StateServer, SQLServer               |
+| 42     | Web.config Transformation               | Deploy-specific config changes               |
+| 43     | Consume Web API                         | HttpClient for REST APIs                     |
+| 44     | Global.asax                             | App-level events (Start, Error, etc.)        |
+| 45     | Caching Pages/Controls                  | OutputCache & PartialCaching                 |
+| 46     | Response.Write vs Response.Output.Write | Output.Write supports formatted strings      |
+| 47     | Hidden Fields                           | Store hidden data for PostBacks              |
+| 48     | File Upload                             | FileUpload control with Server.SaveAs        |
+| 49     | Strongly Typed Controls                 | Data-bound with IntelliSense                 |
+| 50     | Large File Uploads                      | Increase limits, use chunked uploads         |
+
+---
+
+### ⚡ Next Step for You:
+
+✅ Do you want me to make a **PDF Cheat Sheet with all 50 questions + diagrams (Page Lifecycle, ViewState, Session Flow, etc.)**?
+
+✅ Or should I create a **Mini WebForms Project (CRUD, ViewState, AJAX, Validation)** for you to **showcase in interviews**?
+
+✅ Or do you want me to prepare **a rapid-fire mock interview** on these 50 WebForms questions?
+
+👉 **Which one should I prepare for you first?**
+
