@@ -1,0 +1,464 @@
+Basic Questions
+--------------------------
+1) What is ASP.NET WebForms?
+ASP.NET WebForms is a part of the ASP.NET framework used to build dynamic, data-driven web applications. It provides a drag-and-drop, event-driven programming model, making it similar to Windows Forms for web development.
+ 
+Key Points:
+Uses server controls and code-behind files.
+Maintains state between HTTP requests using ViewState.
+Built on top of IIS (Internet Information Services).
+
+
+2) What are the key features of ASP.NET WebForms?
+Event-Driven Programming: Similar to desktop apps (Click, TextChanged).
+ViewState: Maintains control values between postbacks.
+Rich Server Controls: DataGrid, GridView, Calendar, etc.
+Code-Behind Model: Separates HTML UI from C#/VB.NET logic.
+Master Pages: Enables consistent layout across pages.
+Built-in Security: Supports Forms and Windows Authentication.
+Validation Controls: Easily validate user inputs.
+State Management: ViewState, Session, Cookies, and Application state.
+
+3) Explain the WebForms Page Life Cycle in detail.
+Page_PreInit → Page_Init → Page_Load → Control Events → Page_PreRender → Page_Render → Page_Unload
+
+4) What is ViewState in WebForms?
+ViewState is a hidden field (__VIEWSTATE) that ASP.NET uses to store the state of controls between postbacks.
+Example:
+You enter a value in a TextBox.
+On postback, ViewState restores that value.
+
+✔ Pros: Simplifies state management.
+✔ Cons: Increases page size.
+✔ Disable ViewState:<asp:TextBox ID="txtName" runat="server" EnableViewState="false"></asp:TextBox>
+
+
+5) How does PostBack work in WebForms?
+PostBack is the process where a WebForms page submits data to the server, and the same page is reloaded with updated data.
+
+How it Works:
+Controls send data to server via __doPostBack() JavaScript function.
+Server processes request, updates ViewState, and sends the updated HTML back.
+Check for PostBack:
+
+if (!IsPostBack)
+{
+    // Code that runs only on first load
+}
+
+6) What are Server Controls in WebForms?
+ASP.NET Server Controls are objects on a WebForm that run on the server and render HTML to the browser.
+
+Examples:
+Standard Controls: Button, TextBox, Label.
+Data Controls: GridView, Repeater.
+Validation Controls: RequiredFieldValidator, RangeValidator.
+
+
+7) What is the difference between HTML controls and ASP.NET Server controls?
+| Aspect               | HTML Controls           | ASP.NET Server Controls                       |
+| -------------------- | ----------------------- | --------------------------------------------- |
+|   Runs On            | Client-side only        | Server-side + client-side                     |
+|   Events             | No server events        | Supports server events                        |
+|   State Management   | No automatic state      | Maintains state via ViewState                 |
+|   Example            | `<input type="text" />` | `<asp:TextBox ID="txtName" runat="server" />` |
+
+
+8) How does event handling work in WebForms?
+Event Handling:
+Server controls generate events (e.g., Button Click).
+Handled on the server-side in the code-behind file.
+Example
+protected void btnSubmit_Click(object sender, EventArgs e)
+{
+    lblMessage.Text = "Button clicked!";
+}
+
+ASP.NET maps the event using the __EVENTTARGET hidden field during PostBack.
+
+9) What are Master Pages? How are they used?
+Master Pages allow you to define a common layout (header, footer, navigation) for multiple WebForms pages.
+
+How to Use:
+Create a Master Page: Site.master
+Add a ContentPlaceHolder:
+Example
+<asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+
+In content pages, fill placeholders:
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <h1>Welcome!</h1>
+</asp:Content>
+
+10) What are User Controls (ASCX) and when would you use them?
+User Controls are reusable components (like mini pages) that can be embedded in multiple WebForms pages.
+ 
+When to Use:
+Reusable UI pieces (e.g., login forms, navigation bars).
+
+Steps:
+Create LoginControl.ascx.
+Add to a page:
+Example
+<%@ Register Src="~/LoginControl.ascx" TagName="LoginControl" TagPrefix="uc" %>
+<uc:LoginControl ID="Login1" runat="server" />
+
+Intermediate Questions 
+-----------------------------------------------
+
+11. Explain the difference between Session State, Application State, and ViewState.
+| Feature 	      | Session State	                            | Application State	                        | ViewState                                   |
+| --------------- | ------------------------------------------- | ----------------------------------------- | ------------------------------------------- |
+| Scope	          | Specific to a user session                  | Shared across all users and sessions      | Specific to a single page for a single user |
+| Lifetime	      | Until browser is closed / session times out | Until the application restarts            | Until the next PostBack                     |
+| Stored In       | Server memory (by default)                  | Server memory                             | Hidden field (`__VIEWSTATE`) in the page    |
+| Example Use	  | Shopping cart items                         | App-wide counters like total active users | Retaining control values between postbacks  |
+
+Example:
+// Session
+Session["UserName"] = "John";
+
+// Application
+Application["AppCounter"] = 100;
+
+// ViewState
+ViewState["PageCounter"] = 5;
+
+12. What is the difference between Server.Transfer and Response.Redirect?
+
+| Feature              	   | Server.Transfer                     	 | Response.Redirect                     	 |
+| ------------------------ | --------------------------------------- | ----------------------------------------- |
+| Browser URL	           | URL in browser does not change          | URL in browser changes                    |
+| Round Trip to Client	   | No (server handles transfer internally) | Yes (makes a round trip to client)        |
+| Performance	           | Faster                                  | Slightly slower (due to extra round trip) |
+| Cross-Domain Support 	   | No                                      | Yes                                       |
+
+Example:
+// Server.Transfer
+Server.Transfer("Page2.aspx");
+
+// Response.Redirect
+Response.Redirect("Page2.aspx");
+
+
+
+13. How do you handle errors and exceptions in WebForms?
+Ways to handle errors:
+
+1.Try-Catch Block (Code Level):
+Example
+try
+{
+    int result = 10 / int.Parse(txtNumber.Text);
+}
+catch (DivideByZeroException ex)
+{
+    lblError.Text = "Cannot divide by zero!";
+}
+
+
+2.Global Error Handling (Global.asax):
+
+protected void Application_Error(object sender, EventArgs e)
+{
+    Exception ex = Server.GetLastError();
+    // Log error
+    Response.Redirect("~/ErrorPage.aspx");
+}
+
+3. Custom Errors in Web.config:
+
+
+<customErrors mode="On" defaultRedirect="ErrorPage.aspx">
+  <error statusCode="404" redirect="NotFound.aspx" />
+</customErrors>
+
+
+14. What are HTTP Handlers and HTTP Modules?
+HTTP Handler:
+Processes HTTP requests for specific types of resources.
+Example: Serving `.aspx`, `.ashx`, or custom file types.
+
+HTTP Module:
+Works like a filter to process requests/responses during their lifecycle.
+
+Example:
+Handler (.ashx):
+public class MyHandler : IHttpHandler
+{
+    public void ProcessRequest(HttpContext context)
+    {
+        context.Response.ContentType = "text/plain";
+        context.Response.Write("Hello from Handler!");
+    }
+
+    public bool IsReusable => false;
+}
+
+Module:
+public class MyModule : IHttpModule
+{
+    public void Init(HttpApplication app)
+    {
+        app.BeginRequest += (src, args) =>
+        {
+            HttpContext.Current.Response.Write("Request started<br>");
+        };
+    }
+
+    public void Dispose() { }
+}
+
+15. What is Cross-Page PostBack in WebForms?
+
+Definition:
+Cross-Page PostBack allows data to be posted from one page to another page, and the second page can access the values of controls on the first page.
+
+How to use:
+
+1. Set "PostBackUrl" property on a Button:
+
+
+<asp:Button ID="btnSubmit" runat="server" PostBackUrl="~/Page2.aspx" Text="Go" />
+
+
+2. On target page, access source page:
+
+
+string name = ((TextBox)PreviousPage.FindControl("txtName")).Text;
+
+
+16. What are Validation Controls in WebForms?
+Purpose:
+Validation controls help ensure that user input meets certain criteria before processing.
+
+Types of Validators:
+| Validator               	 | Purpose	                               |
+| -------------------------- | --------------------------------------- |
+| RequiredFieldValidator     | Ensures the field is not empty          |
+| RangeValidator             | Checks if input falls within a range    |
+| RegularExpressionValidator | Matches input against a pattern         |
+| CompareValidator           | Compares values of two controls         |
+| CustomValidator            | Allows custom validation logic          |
+| ValidationSummary          | Displays all validation errors together |
+
+Example:
+
+<asp:TextBox ID="txtAge" runat="server"></asp:TextBox>
+<asp:RangeValidator ID="rvAge" runat="server"
+    ControlToValidate="txtAge"
+    MinimumValue="18" MaximumValue="60"
+    Type="Integer" ErrorMessage="Age must be 18-60"></asp:RangeValidator>
+
+
+17. How does State Management work in WebForms?
+
+Two Types:
+1. Client-Side:
+   ViewState, Cookies, QueryStrings, Hidden Fields.
+
+2. Server-Side:
+   Session, Application, Cache.
+
+Example:
+
+// Client-side (ViewState)
+ViewState["Counter"] = 5;
+
+// Server-side (Session)
+Session["UserName"] = "John";
+
+
+18. Explain IsPostBack property with an example.
+
+Definition:
+"IsPostBack" indicates whether the page is loaded for the first time or as a result of a PostBack.
+
+Example:
+protected void Page_Load(object sender, EventArgs e)
+{
+    if (!IsPostBack)
+    {
+        // Load dropdown data only on first load
+        ddlCities.DataSource = GetCities();
+        ddlCities.DataBind();
+    }
+}
+
+19. What are Repeater, DataList, and GridView controls?
+| Control  | Description   							                  |
+| -------- | -------------------------------------------------------- |
+| Repeater | Lightweight, no built-in styling, full control of HTML.  |
+| DataList | Supports multi-column layouts with some styling options. |
+| GridView | Rich control with built-in paging, sorting, and editing. |
+
+GridView Example:
+<asp:GridView ID="gvEmployees" runat="server" AutoGenerateColumns="true"></asp:GridView>
+
+
+gvEmployees.DataSource = GetEmployeeData();
+gvEmployees.DataBind();
+
+
+20. How do you perform CRUD operations in WebForms ?
+Steps for CRUD with GridView:
+1. Bind data to GridView.
+2. Enable `AutoGenerateEditButton` and `AutoGenerateDeleteButton`.
+3. Handle events: `RowEditing`, `RowUpdating`, `RowDeleting`.
+
+Example:
+protected void gvEmployees_RowUpdating(object sender, GridViewUpdateEventArgs e)
+{
+    int id = Convert.ToInt32(gvEmployees.DataKeys[e.RowIndex].Value);
+    string name = ((TextBox)gvEmployees.Rows[e.RowIndex].FindControl("txtName")).Text;
+    UpdateEmployee(id, name);
+    gvEmployees.EditIndex = -1;
+    BindGrid();
+}
+
+21. What is Client-Side vs Server-Side Validation in WebForms?
+Client-Side Validation:
+Happens in the browser using JavaScript.
+Faster (no round trip to server).
+Prevents bad input before submitting the form.
+
+Server-Side Validation:
+Happens on the server after submission.
+Ensures security (users can bypass client validation by disabling JS).
+
+Example of Client-Side Validation:
+<asp:RequiredFieldValidator ID="rfvName" runat="server"
+    ControlToValidate="txtName" ErrorMessage="Name is required"
+    EnableClientScript="true" Display="Dynamic"></asp:RequiredFieldValidator>
+
+Key Difference:
+Client-side improves user experience; server-side ensures data integrity and security.
+
+
+22. What are the differences between ASP.NET WebForms and ASP.NET MVC?
+| Feature          | WebForms                     | MVC                                        |
+| ---------------- | ---------------------------- | ---------------------------------------------- |
+| Architecture     | Page-based, event-driven     | Model-View-Controller (separation of concerns) |
+| State Management | ViewState                    | Stateless (better for web scale apps)          |
+| HTML Control     | Auto-generated               | Full control over HTML                         |
+| Testability      | Harder to test               | Easily testable with unit tests                |
+| URL Routing      | Limited support              | Powerful routing out-of-the-box                |
+| Use Case         | Legacy apps, rapid UI design | Modern, scalable, maintainable apps            |
+
+
+
+23. How do you secure a WebForms application?
+Best Practices:
+1. Use Forms Authentication:
+<authentication mode="Forms">
+  <forms loginUrl="Login.aspx" timeout="30" />
+</authentication>
+
+2.Role-based Authorization:
+<authorization>
+  <deny users="?" /> <!-- Deny anonymous users -->
+  <allow roles="Admin" />
+</authorization>
+
+3. Validate all user inputs (prevent SQL Injection).
+4. Use HTTPS (SSL/TLS).
+5. Store sensitive data securely (e.g., passwords hashed with PBKDF2).
+6. Prevent Cross-Site Scripting (XSS) using `Server.HtmlEncode()`.
+
+
+
+24. What are Themes and Skins in WebForms?
+Themes:
+Define the look and feel (CSS, images, skins).
+Applied at page or application level.
+
+Skins:
+Define default property settings for controls.
+Example:
+
+<!-- Web.config -->
+<pages theme="MyTheme" />
+
+<asp:Button ID="btnSubmit" runat="server" Text="Submit" SkinID="PrimaryButton" />
+
+25. What are Cookies? How are they different from Sessions?
+
+| Feature        | Cookies                          | Session                                 |
+| -------------- | -------------------------------- | --------------------------------------- |
+| Stored On      | Client browser                   | Server memory                           |
+| Lifetime   	   | Can persist after browser closes | Ends when browser closes (or times out) |
+| Size Limit	   | Small (\~4KB)                    | Larger, only limited by server memory   |
+| Use Case   	   | “Remember Me” login, preferences | Shopping cart, user login state         |
+
+Cookie Example
+Response.Cookies["UserName"].Value = "John";
+Response.Cookies["UserName"].Expires = DateTime.Now.AddDays(1);
+
+
+Session Example:
+Session["UserName"] = "John";
+
+26. What is the difference between inline code and code-behind?
+
+| Feature         | Inline Code                       | Code-Behind                               |
+| --------------- | --------------------------------- | ----------------------------------------- |
+| Definition      | Code embedded within ASPX page    | Code separated in a .cs (or .vb) file     |
+| Maintainability | Harder to maintain                | Easier to manage and scale                |
+| Example         | `<% Response.Write("Hello!"); %>` | `lblMessage.Text = "Hello!";` in .cs file |
+
+Preferred: Code-behind (cleaner architecture).
+
+
+27. Explain Page\_PreInit, Page\_Init, Page\_Load, and Page\_Unload.
+| Event         | Purpose                                                |
+| ------------- | ------------------------------------------------------ |
+| Page\_PreInit | Set master page, themes; create dynamic controls.      |
+| Page\_Init    | Initialize controls but ViewState is not restored yet. |
+| Page\_Load    | Controls are fully initialized; use IsPostBack here.   |
+| Page\_Unload  | Cleanup resources (cannot access page controls).       |
+
+Example:
+protected void Page_PreInit(object sender, EventArgs e) { }
+protected void Page_Init(object sender, EventArgs e) { }
+protected void Page_Load(object sender, EventArgs e) { }
+protected void Page_Unload(object sender, EventArgs e) { }
+
+
+
+28. How do you pass data between pages in WebForms?
+Ways to Pass Data:
+1. Query Strings:
+Response.Redirect("Page2.aspx?UserName=John");
+
+2. Session:
+Session["UserName"] = "John";
+Response.Redirect("Page2.aspx");
+
+3. Cross-Page PostBack:
+   Use `PostBackUrl` and `PreviousPage.FindControl`.
+
+
+29. What is the difference between Static Binding and Dynamic Binding in Data Controls?
+
+| Feature     | Static Binding                              | Dynamic Binding                            |
+| ----------- | -----------------------------------------   | ------------------------------------------ |
+| Definition  | Data assigned at design time (in markup).   | Data assigned at runtime (in code-behind). |
+| Flexibility | Less flexible.                              | Highly flexible.                           |
+| Example     | `<asp:Label Text='<%# Eval("Name") %>' />`  | `GridView.DataSource = GetData();`         |
+
+Dynamic Binding Example:
+
+GridView1.DataSource = GetEmployees();
+GridView1.DataBind();
+
+
+30. What is Trace in ASP.NET WebForms?
+Definition:
+Trace provides runtime debugging information about page requests, control state, and server variables.
+
+Enable Trace:
+<%@ Page Trace="true" %>
+
+Key Use Cases:
+Debug page flow and events.
+Analyze execution time of controls.
